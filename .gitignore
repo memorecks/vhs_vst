@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Build output
+plugin/build/
+plugin/dist/
+build/
+
+# JUCE is fetched by CMake if not present (see plugin/CMakeLists.txt)
+plugin/third_party/JUCE/
+
+# Offline test renders (VHSTest output)
+plugin/preset_*.wav
+plugin/impulse_neutral.wav
+test_out/
+
+# Python
+__pycache__/
+*.pyc
+tools/ens_decoder/cells.pkl

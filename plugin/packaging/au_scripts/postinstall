@@ -1,0 +1,4 @@
+#!/bin/sh
+# Make hosts rescan Audio Units so the new/updated VHS.component shows up without a reboot.
+killall -9 AudioComponentRegistrar 2>/dev/null
+exit 0

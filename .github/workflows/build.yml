@@ -1,0 +1,50 @@
+name: Build VHS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+          - os: macos-14
+            name: macos
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: plugin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVHS_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Offline DSP tests
+        shell: bash
+        run: |
+          exe=$(find build -type f \( -name VHSTest -o -name VHSTest.exe \) | head -1)
+          "$exe" test_out
+
+      - name: Installer (macOS, unsigned)
+        if: runner.os == 'macOS'
+        run: ./package_mac.sh --no-build
+
+      - name: Installer (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: package_windows.bat --no-build
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: VHS-${{ matrix.name }}
+          path: plugin/dist
